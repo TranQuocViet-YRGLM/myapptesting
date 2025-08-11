@@ -48,9 +48,6 @@ jobs:
 
           echo "$RESPONSE" > review_result.txt
 
-      - name: Show AI review result in logs
-          run: cat review_result.txt
-
       - name: Post comment to PR (if PR)
         if: github.event_name == 'pull_request'
         uses: marocchino/sticky-pull-request-comment@v2
@@ -65,3 +62,6 @@ jobs:
           curl -X POST "$GOOGLE_WEBHOOK_URL" \
             -H "Content-Type: application/json" \
             -d "{\"repo\":\"${{ github.repository }}\", \"event\":\"${{ github.event_name }}\", \"review\":$DATA}"
+
+      - name: Show AI review result in logs
+          run: cat review_result.txt
