@@ -95,11 +95,11 @@ jobs:
         with:
           path: review_result.txt
 
-      - name: Send result to Google Sheet
+            - name: Send review result to Slack
         env:
-          GOOGLE_WEBHOOK_URL: ${{ secrets.GOOGLE_WEBHOOK_URL }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
-          DATA=$(jq -Rs . < review_result.txt)
-          curl -X POST "$GOOGLE_WEBHOOK_URL" \
-            -H "Content-Type: application/json" \
-            -d "{\"repo\":\"${{ github.repository }}\", \"event\":\"${{ github.event_name }}\", \"review\":$DATA}"
+          REVIEW=$(cat review_result.txt)
+          PAYLOAD=$(jq -n --arg text "$REVIEW" '{text: $text}')
+          curl -X POST -H 'Content-type: application/json' --data "$PAYLOAD" $SLACK_WEBHOOK_URL
+
