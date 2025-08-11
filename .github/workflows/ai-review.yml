@@ -94,6 +94,7 @@ jobs:
         uses: marocchino/sticky-pull-request-comment@v2
         with:
           path: review_result.txt
+          repo-token: ${{ secrets.PAT_TOKEN }}
 
       - name: Send review result to Slack
         env:
