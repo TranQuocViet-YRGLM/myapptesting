@@ -20,18 +20,18 @@ jobs:
 
       - name: Get code diff
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
             git fetch origin main
             git diff origin/main...HEAD > diff.txt
           else
-            git diff HEAD~1 HEAD > diff.txt
+            git diff HEAD^ HEAD > diff.txt
           fi
 
       - name: Run AI review
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          RULES=$(cat review_rules.md)
+          RULES=$(cat review_rules.md | sed 's/"/\\"/g')
           DIFF_CONTENT=$(cat diff.txt | sed 's/"/\\"/g')
           PROMPT="${RULES}\n${DIFF_CONTENT}"
 
