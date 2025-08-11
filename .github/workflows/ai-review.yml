@@ -95,7 +95,7 @@ jobs:
         with:
           path: review_result.txt
 
-            - name: Send review result to Slack
+      - name: Send review result to Slack
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
