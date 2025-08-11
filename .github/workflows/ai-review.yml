@@ -1,4 +1,4 @@
-name: AI Code Review by MichaelTran
+name: AI Code Review
 
 on:
   push:
@@ -20,21 +20,20 @@ jobs:
 
       - name: Get code diff
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
+          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
             git fetch origin main
             git diff origin/main...HEAD > diff.txt
           else
-            git diff HEAD~1 HEAD > diff.txt
+            git diff HEAD^ HEAD > diff.txt
           fi
 
-      # ✅ Debug rules & diff
       - name: Debug input files
         run: |
           echo "=== RULES FILE CONTENT ==="
           cat .github/workflows/review_rules.md || echo "❌ review_rules.md NOT FOUND!"
           echo "=== DIFF FILE CONTENT ==="
           cat diff.txt || echo "❌ diff.txt is empty!"
-          
+
           if [ ! -s .github/workflows/review_rules.md ]; then
             echo "❌ ERROR: Rules file is missing or empty!"
             exit 1
@@ -48,9 +47,10 @@ jobs:
         env:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
-          RULES=$(cat .github/workflows/review_rules.md | sed 's/"/\\"/g')
-          DIFF_CONTENT=$(cat diff.txt | sed 's/"/\\"/g')
-          PROMPT="${RULES}\n${DIFF_CONTENT}"
+          RULES=$(cat .github/workflows/review_rules.md | jq -Rs .)
+          DIFF_CONTENT=$(cat diff.txt | jq -Rs .)
+
+          PROMPT=$(jq -n --arg rules "$RULES" --arg diff "$DIFF_CONTENT" '$rules + "\n" + $diff')
 
           echo "=== Sending prompt to OpenAI ==="
           echo "$PROMPT"
@@ -62,21 +62,19 @@ jobs:
                   \"model\": \"gpt-4o-mini\",
                   \"messages\": [
                     {\"role\": \"system\", \"content\": \"You are a senior software engineer reviewing code.\"},
-                    {\"role\": \"user\", \"content\": \"${PROMPT}\"}
+                    {\"role\": \"user\", \"content\": $PROMPT}
                   ]
                 }")
 
           echo "=== RAW RESPONSE FROM OPENAI ==="
           echo "$RESPONSE_RAW"
 
-          # ✅ Check HTTP status
           HTTP_STATUS=$(echo "$RESPONSE_RAW" | grep HTTP_STATUS | cut -d: -f2)
           if [ "$HTTP_STATUS" != "200" ]; then
             echo "❌ ERROR: OpenAI API request failed with status $HTTP_STATUS"
             exit 1
           fi
 
-          # ✅ Extract content
           RESPONSE=$(echo "$RESPONSE_RAW" | grep -v HTTP_STATUS | jq -r '.choices[0].message.content')
           if [ "$RESPONSE" == "null" ] || [ -z "$RESPONSE" ]; then
             echo "❌ ERROR: No response from OpenAI!"
