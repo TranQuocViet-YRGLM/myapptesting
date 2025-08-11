@@ -1,4 +1,4 @@
-name: AI Code Review
+name: AI Code Review by MichaelTran
 
 on:
   push:
@@ -20,11 +20,28 @@ jobs:
 
       - name: Get code diff
         run: |
-          if [ "${GITHUB_EVENT_NAME}" = "pull_request" ]; then
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
             git fetch origin main
             git diff origin/main...HEAD > diff.txt
           else
-            git diff HEAD^ HEAD > diff.txt
+            git diff HEAD~1 HEAD > diff.txt
+          fi
+
+      # ✅ Debug rules & diff
+      - name: Debug input files
+        run: |
+          echo "=== RULES FILE CONTENT ==="
+          cat .github/workflows/review_rules.md || echo "❌ review_rules.md NOT FOUND!"
+          echo "=== DIFF FILE CONTENT ==="
+          cat diff.txt || echo "❌ diff.txt is empty!"
+          
+          if [ ! -s .github/workflows/review_rules.md ]; then
+            echo "❌ ERROR: Rules file is missing or empty!"
+            exit 1
+          fi
+          if [ ! -s diff.txt ]; then
+            echo "❌ ERROR: No code changes detected!"
+            exit 1
           fi
 
       - name: Run AI review
@@ -35,7 +52,10 @@ jobs:
           DIFF_CONTENT=$(cat diff.txt | sed 's/"/\\"/g')
           PROMPT="${RULES}\n${DIFF_CONTENT}"
 
-          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+          echo "=== Sending prompt to OpenAI ==="
+          echo "$PROMPT"
+
+          RESPONSE_RAW=$(curl -s -w "\nHTTP_STATUS:%{http_code}\n" https://api.openai.com/v1/chat/completions \
             -H "Content-Type: application/json" \
             -H "Authorization: Bearer $OPENAI_API_KEY" \
             -d "{
@@ -44,7 +64,24 @@ jobs:
                     {\"role\": \"system\", \"content\": \"You are a senior software engineer reviewing code.\"},
                     {\"role\": \"user\", \"content\": \"${PROMPT}\"}
                   ]
-                }" | jq -r '.choices[0].message.content')
+                }")
+
+          echo "=== RAW RESPONSE FROM OPENAI ==="
+          echo "$RESPONSE_RAW"
+
+          # ✅ Check HTTP status
+          HTTP_STATUS=$(echo "$RESPONSE_RAW" | grep HTTP_STATUS | cut -d: -f2)
+          if [ "$HTTP_STATUS" != "200" ]; then
+            echo "❌ ERROR: OpenAI API request failed with status $HTTP_STATUS"
+            exit 1
+          fi
+
+          # ✅ Extract content
+          RESPONSE=$(echo "$RESPONSE_RAW" | grep -v HTTP_STATUS | jq -r '.choices[0].message.content')
+          if [ "$RESPONSE" == "null" ] || [ -z "$RESPONSE" ]; then
+            echo "❌ ERROR: No response from OpenAI!"
+            exit 1
+          fi
 
           echo "$RESPONSE" > review_result.txt
 
