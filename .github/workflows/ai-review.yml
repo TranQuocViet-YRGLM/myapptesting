@@ -1,0 +1,62 @@
+name: AI Code Review
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  ai_review:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Get code diff
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            git fetch origin main
+            git diff origin/main...HEAD > diff.txt
+          else
+            git diff HEAD~1 HEAD > diff.txt
+          fi
+
+      - name: Run AI review
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+        run: |
+          RULES="Review the following code changes based on the coding rules and best practices defined:\n"
+          DIFF_CONTENT=$(cat diff.txt | sed 's/"/\\"/g')
+          PROMPT="${RULES}\n${DIFF_CONTENT}"
+
+          RESPONSE=$(curl -s https://api.openai.com/v1/chat/completions \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $OPENAI_API_KEY" \
+            -d "{
+                  \"model\": \"gpt-4o-mini\",
+                  \"messages\": [
+                    {\"role\": \"system\", \"content\": \"You are a senior software engineer reviewing code.\"},
+                    {\"role\": \"user\", \"content\": \"${PROMPT}\"}
+                  ]
+                }" | jq -r '.choices[0].message.content')
+
+          echo "$RESPONSE" > review_result.txt
+
+      - name: Post comment to PR (if PR)
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          path: review_result.txt
+
+      - name: Send result to Google Sheet
+        env:
+          GOOGLE_WEBHOOK_URL: ${{ secrets.GOOGLE_WEBHOOK_URL }}
+        run: |
+          DATA=$(jq -Rs . < review_result.txt)
+          curl -X POST "$GOOGLE_WEBHOOK_URL" \
+            -H "Content-Type: application/json" \
+            -d "{\"repo\":\"${{ github.repository }}\", \"event\":\"${{ github.event_name }}\", \"review\":$DATA}"
