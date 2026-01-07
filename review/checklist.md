@@ -1,0 +1,363 @@
+# Review Checklist
+
+## PSR-1 Coding Convention
+- [ ] PHP files must use UTF-8 without BOM
+- [ ] Only use `<?php` or `<?=`; omit closing `?>` in pure PHP files
+- [ ] Each file should contain only one class, interface, trait, or a set of related functions
+- [ ] All classes must be within a proper namespace
+- [ ] Class names in PascalCase (StudlyCase)
+- [ ] Constants in UPPER\_SNAKE\_CASE
+- [ ] Properties and methods in camelCase
+
+## PSR-2 Coding Convention
+- [ ] Indent with 4 spaces, no tabs
+- [ ] Opening `{` on the same line as class/function/control structure declaration
+- [ ] Closing `}` on its own line
+- [ ] One space after keywords (`if`, `for`, etc.), no space after `(` or before `)`
+- [ ] Always declare visibility (`public`, `protected`, `private`) for methods and properties
+- [ ] No space between method name and `(` when calling
+- [ ] One space after commas in argument lists
+- [ ] Maximum line length ≤ 120 characters (recommended ≤ 80)
+
+## PSR-4 Coding Convention
+- [ ] File name must match class name + `.php`
+- [ ] Directory structure must match the namespace (after the base namespace)
+- [ ] Namespace must be defined in `composer.json` under `"psr-4"`
+- [ ] File names and namespaces are case-sensitive
+
+## PSR-12 Coding Convention
+- [ ] Indent with 4 spaces, no tabs
+- [ ] Opening `{` on same line as class/function
+- [ ] Blank lines between methods/classes
+- [ ] File/class names PascalCase (e.g., `UserService.php`, `UserService`)
+- [ ] Methods/variables camelCase; constants UPPER_SNAKE_CASE
+- [ ] Spaces around operators (`=`, `+`, `-`, `===`, ...)
+- [ ] No commented-out code in production
+- [ ] Max line length ≤ 120
+
+## PHPStan Level 6 Compliance
+- [ ] Public methods declare return types
+- [ ] All parameters and variables have type hints
+- [ ] No uninitialized variables
+- [ ] No access to undefined properties/methods
+- [ ] Avoid `mixed` unless necessary
+
+## Laravel 11 Conventions
+- [ ] Use Dependency Injection for services/repositories
+- [ ] Use FormRequest for validation; pass `$request->validated()` to services
+- [ ] Resources return data only (no HTML rendering)
+- [ ] Use Eloquent Accessors/Mutators for attribute logic
+- [ ] Avoid DB queries in loops; prevent N+1 with eager loading
+- [ ] Prefer collections/query optimizations over heavy loops
+- [ ] Use enums/constants (no magic values)
+- [ ] Use strict comparison (`===`); booleans start with `is/has/can`
+- [ ] Use Blade for HTML; ensure CSRF and escaped output
+
+## PHPDoc Documentation
+- [ ] PHPDoc for classes, methods, properties, and parameters
+- [ ] Clear purpose, params, and return types
+
+## General Rules
+- [ ] DRY: no duplicated logic
+- [ ] KISS: methods short and simple
+- [ ] Add comments for complex logic
+- [ ] Clear, meaningful names; maintainable/extendable code
+
+## Security, Performance, Standards, Refactor
+- [ ] Logic: correct behavior; errors/exceptions handled; null/empty/type checks
+- [ ] Security: no XSS/CSRF/SQLi; protect sensitive data; strict access control
+- [ ] Performance: no DB in loops; eager loading; optimized iterations
+- [ ] Standards: PSR-12; full PHPDoc; naming clear; line length ≤ 120
+- [ ] Clean Code: remove unused/commented code; small methods/classes
+- [ ] Refactor: split complex pieces; improve naming; optimize queries/loops
+
+## Commands & CI (Quick Ref)
+<!-- - Lint/Format: `composer lint`, `composer format`
+- Tests: `composer test`
+- Static analysis: `composer stan` (level 6), baseline `composer stan:baseline`
+- Refactor check: `composer rector:dry`
+- CI runs PHPCS, PHPUnit, Rector dry-run, PHPStan L6 (scoped to `platform/**`). -->
+
+## PHPStan Ruleset 
+- Level 0: PHPStan\Rules\Classes\NewStaticInAbstractClassStaticMethodRule
+- Level 0: PHPStan\Rules\InternalTag\RestrictedInternalClassConstantUsageExtension
+- Level 0: PHPStan\Rules\InternalTag\RestrictedInternalClassNameUsageExtension
+- Level 0: PHPStan\Rules\InternalTag\RestrictedInternalFunctionUsageExtension
+- Level 2: PHPStan\Rules\PhpDoc\IncompatiblePhpDocTypeRule
+- Level 2: PHPStan\Rules\PhpDoc\InvalidPhpDocTagValueRule
+- Level 2: PHPStan\Rules\PhpDoc\InvalidPHPStanDocTagRule
+- Level 2: PHPStan\Rules\PhpDoc\UnresolvableTypeHelperRule
+- Level 2: PHPStan\Rules\InternalTag\RestrictedInternalMethodUsageExtension
+- Level 2: PHPStan\Rules\InternalTag\RestrictedInternalPropertyUsageExtension
+- Level 3: PHPStan\Rules\DeadCode\UnusedPrivatePropertyRule
+- Level 3: PHPStan\Rules\Properties\TypesAssignedToPropertiesRule
+- Level 3: PHPStan\Rules\Properties\WritingToReadOnlyPropertiesRule
+- Level 3: PHPStan\Rules\Returning\InvalidReturnTypeRule
+- Level 4: PHPStan\Rules\Comparison\BooleanAndConstantConditionRule
+- Level 4: PHPStan\Rules\Comparison\BooleanOrConstantConditionRule
+- Level 4: PHPStan\Rules\Comparison\IfConstantConditionRule
+- Level 4: PHPStan\Rules\Comparison\UnreachableIfBranchesRule
+- Level 4: PHPStan\Rules\Comparison\UnreachableTernaryElseBranchRule
+- Level 4: PHPStan\Rules\DeadCode\InvalidJitConfigurationRule
+- Level 4: PHPStan\Rules\DeadCode\NoopRule
+- Level 4: PHPStan\Rules\DeadCode\UnreachableStatementRule
+- Level 4: PHPStan\Rules\Exceptions\TooWideFunctionThrowTypeRule
+- Level 4: PHPStan\Rules\Exceptions\TooWideMethodThrowTypeRule
+- Level 4: PHPStan\Rules\Exceptions\TooWidePropertyHookThrowTypeRule
+- Level 5: PHPStan\Rules\Functions\ParameterCastableToNumberRule
+- Level 6: PHPStan\Rules\Classes\MissingTraitTypehintRule
+- Level 6: PHPStan\Rules\Functions\MissingFunctionParameterTypehintRule
+- Level 6: PHPStan\Rules\Methods\MissingMethodParameterTypehintRule
+- Level 6: PHPStan\Rules\Methods\MissingReturnTypehintRule
+- Level 6: PHPStan\Rules\Properties\MissingPropertyTypehintRule
+- Level 6: PHPStan\Rules\Properties\UninitializedPropertyRule
+
+## SonarQube Ruleset
+- S107|   Functions should not have too many parameters 
+- S3415|   Assertion arguments should be passed in the correct order
+- S115|   Constant names should comply with a naming convention 
+- S1605|   \__construct\ functions should not make PHP 4-style calls to parent constructors
+- S1793|   \elseif\ keyword should be used in place of \else if\ keywords 
+- S1126|   Return of boolean expressions should not be wrapped into an \if-then-else\ statement
+- S1075|   URIs should not be hardcoded
+- S3972|   Conditionals should start on new lines
+- S6035|   Single-character alternations in regular expressions should be replaced with character classes 
+- S2010|   \\u0026\u0026\ and \||\ should be used
+- S1067|   Expressions should not be too complex 
+- S5899|   Test methods should be discoverable
+- S1124|   Modifiers should be declared in the correct order 
+- S2166|   Classes named like \Exception\ should extend \Exception\ or a subclass TLS connections 
+- S6328|   Replacement strings should reference existing regular expression groups
+- S6323|   Alternation in regular expressions should not contain empty alternatives 
+- S1854|   Unused assignments should be removed
+- S2701|   Literal boolean values and nulls should not be used in equality assertions 
+- S2002|   Errors should not be silenced
+- S907|   \goto\ statement should not be used 
+- S1784|   Method visibility should be explicitly declared
+- S2044|   \php_sapi_name()\ should not be used 
+- S4142|   Duplicate values should not be passed as arguments
+- S3801|   Functions should use \return\ consistently 
+- S114|   Interface names should comply with a naming convention
+- S2278|   Neither DES (Data Encryption Standard) nor DESede (3DES) should be used 
+- S1116|   Empty statements should be removed
+- S6331|   Regular expressions should not contain empty groups 
+- S1607|   A reason should be provided when skipping a test
+- S1600|   Deprecated predefined variables should not be used 
+- S2001|   Deprecated features should not be used
+- S2187|   TestCases should contain tests 
+- S2053|   Password hashing functions should use an unpredictable salt
+- S4818|   Using Sockets is security-sensitive 
+- S2612|   Setting loose POSIX file permissions is security-sensitive
+- S6418|   Hard-coded secrets are security-sensitive 
+- S4834|   Controlling permissions is security-sensitive
+- S3331|   Creating cookies with broadly defined \domain\ flags is security-sensitive 
+- S1940|   Boolean checks should not be inverted
+- S881|   Increment (++) and decrement (--) operators should not be used in a method call or mixed with other operators in an expression 
+- S1068|   Unused \private\ fields should be removed
+- S6341|   WordPress theme and plugin editors are security-sensitive 
+- S1110|   Redundant pairs of parentheses should be removed
+- S1479|   \switch\ statements should not have too many \case\ clauses 
+- S1848|   Objects should not be created to be dropped immediately without being used
+- S6600|   Unnecessary parentheses should not be used for constructs 
+- S1599|   Variable variables should not be used
+- S1045|   All \catch\ blocks should be able to catch exceptions 
+- S4824|   References used in \foreach\ loops should be \unset\
+- S5869|   Character classes in regular expressions should not contain the same character twice 
+- S1799|   \exit(...)\ and \die(...)\ statements should not be used
+- S2047|   The names of methods with boolean return values should start with \is\ or \has\ 
+- S1313|   Using hardcoded IP addresses is security-sensitive
+- S4508|   Deserializing objects from an untrusted source is security-sensitive 
+- S3336|   \session.use_trans_sid\ should not be enabled
+- S4502|   Disabling CSRF protections is security-sensitive 
+- S1451|   Track lack of copyright and license headers
+- S6001|   Back references in regular expressions should only refer to capturing groups that are matched before the reference 
+- S1314|   Octal values should not be used
+- S905|   Non-empty statements should change control flow or have at least one side-effect 
+- S1134|   Track uses of \FIXME\ tags
+- S2699|   Tests should include assertions 
+- S2038|   Colors should be defined in upper case
+- S2260|   PHP parser failure 
+- S4524|   \default\ clauses should be first or last
+- S2036|   Files that define symbols should not cause side-effects 
+- S2115|   A secure password should be used when connecting to a database
+- S2077|   Formatting SQL queries is security-sensitive 
+- S2255|   Writing cookies is security-sensitive
+- S1448|   Classes should not have too many methods 
+- S1757|   \\u003c?php\ and \\u003c?\u003d\ tags should be used
+- S1697|   Short-circuit logic should be used to prevent null pointer dereferences in conditionals 
+- S5857|   Character classes should be preferred over reluctant quantifiers in regular expressions
+- S3337|   \enable_dl\ should be disabled 
+- S5935|   Framework-provided functions should be used to test exceptions
+- S2757|   Non-existent operators like \\u003d+\ should not be used 
+- S1066|   Mergeable \if\ statements should be combined
+- S1766|   More than one property should not be declared per statement 
+- S6395|   Non-capturing groups without quantifier should not be used
+- S1764|   Identical expressions should not be used on both sides of a binary operator 
+- S112|   Generic exceptions ErrorException RuntimeException and Exception should not be thrown
+- S6347|   WordPress options should not be defined at the end of \wp-config.php\ 
+- S1185|   Overriding methods should do more than simply call the same method in the super class 
+- S2043|   Superglobals should not be accessed directly 
+- S5856|   Regular expressions should be syntactically valid
+- S4823|   Using command line arguments is security-sensitive 
+- S5808|   Authorizations should be based on strong decisions
+- S1109|   A close curly brace should be located at the beginning of a line 
+- S4829|   Reading the Standard Input is security-sensitive
+- S1780|   Closing tag \?\u003e\ should be omitted on files containing only PHP 
+- S5122|   Having a permissive Cross-Origin Resource Sharing policy is security-sensitive
+- S1808|   Source code should comply with formatting standards 
+- S100|   Function names should comply with a naming convention
+- S134|   Control flow statements \if\ \for\ \while\ \switch\ and \try\ should not be nested too deeply 
+- S5632|   Raised Exceptions must derive from Throwable
+- S4784|   Using regular expressions is security-sensitive 
+- S1117|   Local variables should not have the same name as class fields
+- S108|   Nested blocks of code should not be left empty 
+- S1998|   References should not be passed to function calls
+- S2005|   String literals should not be concatenated 
+- S1997|   Files should not contain inline HTML
+- S1311|   Cyclomatic Complexity of classes should not be too high 
+- S1656|   Variables should not be self-assigned
+- S1765|   The \var\ keyword should not be used 
+- S2004|   Functions should not be nested too deeply
+- S5042|   Expanding archive files without controlling resource consumption is security-sensitive 
+- S2761|   Unary prefix operators should not be repeated
+- S4792|   Configuring loggers is security-sensitive 
+- S1135|   Track uses of \TODO\ tags
+- S2681|   Multiline blocks should be enclosed in curly braces 
+- S1301|   \switch\ statements should have at least 3 \case\ clauses
+- S3011|   Reflection should not be used to increase accessibility of classes methods or fields | assertFalse should be simplified to the corresponding dedicated assertion
+- S1155|   \empty()\ should be used to test for emptiness 
+- S5361|   `str_replace` should be preferred to `preg_replace`
+- S5708|   Caught Exceptions must derive from Throwable 
+- S1145|   Useless \if(true) {...}\ and \if(false){...}\ blocks should be removed
+- S1172|   Unused function parameters should be removed 
+- S6396|   Superfluous curly brace quantifiers should be avoided
+- S3335|   \cgi.force_redirect\ should be enabled 
+- S6349|   WordPress option names should not be misspelled
+- S4828|   Signaling processes is security-sensitive 
+- S103|   Lines should not be too long
+- S1763|   All code should be reachable
+- S2011|   \global\ should not be used
+- S1871|   Two branches in a conditional structure should not have exactly the same implementation 
+- S2000|   Files should not contain characters before \\u003c?php\
+- S3776|   Cognitive Complexity of functions should not be too high 
+- S5996|   Regex boundaries should not be used in a way that can never be matched
+- S4507|   Delivering code in production with debug features activated is security-sensitive 
+- S2046|   Perl-style comments should not be used
+- S1200|   Classes should not be coupled to too many other classes 
+- S6019|   Reluctant quantifiers in regular expressions should be followed by an expression that can\u0027t match the empty string
+- S5779|   Assertion failure exceptions should not be ignored | else if\ statements and \cases\ in a \switch\ should not have the same condition
+- S121|   Control structures should use curly braces 
+- S2830|   Class constructors should not create other objects
+- S1105|   An open curly brace should be located at the end of a line 
+- S1820|   Classes should not have too many fields TLS protocols should not be used 
+- S1781|   PHP keywords and constants \true\ \false\ \null\ should be lower case
+- S110|   Inheritance tree of classes should not be too deep 
+- S3973|   A conditionally executed single line should be denoted by indentation
+- S1106|   An open curly brace should be located at the beginning of a line | S1151|   \switch case\ clauses should not have too many lines of code
+- S5863|   Assertions should not compare an object to itself 
+- S1144|   Unused \private\ methods should be removed
+- S5915|   Assertions should not be made at the end of blocks expecting an exception 
+- S1821|   \switch\ statements should not be nested
+- S2755|   XML parsers should not be vulnerable to XXE attacks 
+- S4787|   Encrypting data is security-sensitive
+- S3332|   Session-management cookies should not be persistent 
+- S104|   Files should not have too many lines of code
+- S6345|   Allowing all external requests from a WordPress server is security-sensitive 
+- S6346|   Allowing unauthenticated database repair in WordPress is security-sensitive
+- S2277|   Cryptographic RSA algorithms should always incorporate OAEP (Optimal Asymmetric Encryption Padding) 
+- S1751|   Loops with at most one iteration should be refactored
+- S1142|   Functions should not contain too many return statements 
+- S1541|   Cyclomatic Complexity of functions should not be too high
+- S1603|   Deprecated constructor declarations should not be used  
+- S5994|   Regex patterns following a possessive quantifier should not always fail
+- S138|   Functions should not have too many lines of code 
+- S5842|   Repeated patterns in regular expressions should not match the empty string
+- S1186|   Methods should not be empty 
+- S2234|   Parameters should be passed in the correct order
+- S1779|   Only LF character (Unix-like) should be used to end lines 
+- S4833|   Use of namespaces should be preferred to \include\ or \require\ functions
+- S4433|   LDAP connections should be authenticated 
+- S5876|   A new session should be created during user authentication
+- S116|   Field names should comply with a naming convention 
+- S6348|   Allowing unfiltered HTML content in WordPress is security-sensitive
+- S5542|   Encryption algorithms should be used with secure mode and padding scheme 
+- S3360|   Test class names should end with \Test\
+- S6393|   Regular expressions should have valid delimiters | TLS connections
+- S105|   Tabulation characters should not be used 
+- S131|   \switch\ statements should have \default\ clauses
+- S3923|   All branches in a conditional structure should not have exactly the same implementation 
+- S1264|   A \while\ loop should be used instead of a \for\ loop
+- S3358|   Ternary operators should not be nested 
+- S2251|   A \for\ loop update clause should move the counter in the right direction
+- S2070|   SHA-1 and Message-Digest hash algorithms should not be used in secure contexts 
+- S2201|   Return values from functions without side effects should not be ignored
+- S6397|   Character classes in regular expressions should not contain only one character
+- S2245|   Using pseudorandom number generators (PRNGs) is security-sensitive
+- S1578|   File names should comply with a naming convention 
+- S3338|   \file_uploads\ should be disabled
+- S1481|   Unused local variables should be removed 
+- S5855|   Regex alternatives should not be redundant
+- S127|   \for\ loop stop conditions should be invariant 
+- S139|   Comments should not be located at the end of lines of code
+- S1488|   Local variables should not be declared and then immediately returned or thrown 
+- S2918|   Configuration should not be changed dynamically
+- S125|   Sections of code should not be commented out 
+- S836|   Variables should be initialized before use
+- S2737|   \catch\ clauses should do more than rethrow
+- S5843|   Regular expressions should not be too complicated
+- S1996|   Files should contain only one top-level class or interface each 
+- S5332|   Using clear-text protocols is security-sensitive
+- S4144|   Methods should not have identical implementations 
+- S4143|   Array values should not be replaced unconditionally
+- S930|   The number of arguments passed to a function should match the number of parameters 
+- S117|   Local variable and function parameter names should comply with a naming convention
+- S128|   Switch cases should end with an unconditional \break\ statement 
+- S1121|   Assignments should not be made from within sub-expressions
+- S2123|   Values should not be uselessly incremented 
+- S3334|   \allow_url_fopen\ and \allow_url_include\ should be disabled
+- S1788|   Method arguments with default values should be last
+- S6326|   Regular expressions should not contain multiple spaces
+- S3981|   Array or Countable object count comparisons should make sense
+- S1125|   Boolean literals should not be redundant
+- S3333|   \open_basedir\ should limit file access
+- S126|   \if ... else if\ constructs should end with \else\ clauses
+- S113|   Files should end with a newline 
+- S5328|   Manual generation of session ID is security-sensitive
+- S5867|   Unicode-aware versions of character classes should be preferred 
+- S5783|   Only one method invocation is expected when testing exceptions
+- S5693|   Allowing requests with excessive content length is security-sensitive 
+- S3699|   The output of functions that don\u0027t return anything should not be used
+- S4790|   Using weak hashing algorithms is security-sensitive 
+- S3984|   Exceptions should not be created without being thrown
+- S5911|   Class of caught exception should be defined 
+- S6343|   Disabling automatic updates is security-sensitive
+- S2042|   Classes should not have too many lines of code 
+- S2964|   \sleep\ should not be called
+- S2068|   Hard-coded credentials are security-sensitive 
+- S1226|   Function and method parameters\u0027 initial values should not be ignored
+- S4426|   Cryptographic keys should be robust 
+- S122|   Statements should be on separate lines
+- S6002|   Regex lookahead assertions should not be contradictory 
+- S5547|   Cipher algorithms should be robust
+- S101|   Class names should comply with a naming convention 
+- S2003|   \require_once\ and \include_once\ should be used instead of \require\ and \include\
+- S2007|   Functions and variables should not be defined outside of classes
+- S5797|   Constants should not be used as conditions 
+- S6437|   Credentials should not be hard-coded
+- S3626|   Jump statements should not be redundant 
+- S1192|   String literals should not be duplicated
+- S5713|   A subclass should not be in the same \catch\ clause as a parent class 
+- S6353|   Regular expression quantifiers and character classes should be used concisely
+- S2092|   Creating cookies without the \secure\ flag is security-sensitive 
+- S2037|   Static members should be referenced with \static::\
+- S1131|   Lines should not end with trailing whitespaces 
+- S6339|   Secret keys and salt values should be robust
+- S1523|   Dynamically executing code is security-sensitive 
+- S2050|   Alias functions should not be used
+- S2014|   \$this\ should not be used in a static context 
+- S1990|   \final\ should not be used redundantly
+- S2041|   Parentheses should not be used for calls to \echo\ 
+- S5850|   Alternatives in regular expressions should be grouped when used with anchors
+- S3330|   Creating cookies without the \HttpOnly\ flag is security-sensitive 
+- S6344|   Constants should not be redefined
+- S5868|   Unicode Grapheme Clusters should be avoided inside regex character classes | 

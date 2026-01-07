@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8">
+<title>Code Review Report</title>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css"><link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/vs2015.min.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.8.0/dist/highlightjs-line-numbers.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.11.1/languages/php.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlightjs-line-numbers.js@2.8.0/dist/highlightjs-line-numbers.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/highlightjs-copy@1.0.3/dist/highlightjs-copy.min.js"></script>
+
+        <style>
+        .container {
+            max-width: 2140px !important;
+        }
+        pre {
+            position: relative;
+            /* Đảm bảo nút sao chép nằm đúng vị trí */
+        }
+        .hljs-copy-button {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #1e1e1e;
+            /* Phù hợp với theme vs2015 */
+            color: #d4d4d4;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+            border-radius: 3px;
+            font-size: 12px;
+            z-index: 10;
+            /* Đảm bảo nút không bị che khuất */
+        }
+        .hljs-copy-button:hover {
+            background: #3c3c3c;
+        }
+        .hljs-ln-line.hljs-ln-numbers {
+            padding-right: 10px !important;
+            /* Đảm bảo khoảng cách giữa số dòng và mã */
+        }
+        </style>
+        
+        <script>        
+        document.addEventListener('DOMContentLoaded', function() { 
+            // Đăng ký plugin sao chép
+            hljs.addPlugin(new CopyButtonPlugin({
+                callback: (text, el) => {
+                    navigator.clipboard.writeText(text).then(() => {
+                        el.textContent = 'Đã sao chép!';
+                        setTimeout(() => {
+                            el.textContent = 'Sao chép';
+                        }, 2000);
+                    });
+                }
+            }));
+            // Khởi tạo Highlight.js
+            hljs.highlightAll();
+            // Khởi tạo Line Numbers
+            hljs.initLineNumbersOnLoad({
+            singleLine: true,
+            startFrom: 1
+            });
+        });
+        </script>
+        
+</head>
+<body>
+<h1 class="text-center"># Code Review Report (develop..feature/20250719_something)</h1>
+
+<div class="container">
+<h5>1. File: platform/packages/blog/src/Http/Requests/Article/CreateRequest.php</h5>
+<p>Ghi chú: Đã skip file này, không review.</p>
+</div>
+
+<hr>
+
+<div class="container">
+<h5>2. File: platform/packages/blog/src/Http/Requests/Article/UpdateRequest.php</h5>
+<p>Ghi chú: Đã skip file này, không review.</p>
+</div>
+
+<hr>
+
+<div class="container">
+<h3>3. File: platform/packages/frontend/src/Http/Controllers/FrontendController.php</h3>
+<p><div class="review-result">
+
+<h2>Code Review — FrontendController.php</h2>
+
+<!-- 1. Issues theo rules -->
+<h3>1. Issues theo rules</h3>
+
+<table class="table table-bordered">
+<thead>
+<tr>
+<th>#</th>
+<th>Severity</th>
+<th>Source (Diff/Lint)</th>
+<th>Line</th>
+<th>Rule in Checklist</th>
+<th>Issue</th>
+<th>Suggest Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Minor</td>
+<td>Lint</td>
+<td>46</td>
+<td>PSR-2 / PSR-12 - "Opening { on the same line as function/class declaration"</td>
+<td>PHPCS báo lỗi: "Opening brace should be on a new line". (PHPCS sniff: Generic.Functions.OpeningFunctionBraceBsdAllman.BraceOnSameLine)</td>
+<td>
+<p>Việc fix sẽ tuân theo chuẩn của project (PHPCS hiện cấu hình yêu cầu mở ngoặc trên dòng mới). Di chuyển dấu "{" của hàm __construct xuống dòng mới.</p>
+<p>Ví dụ sửa:</p>
+<pre><code class="php language-php hljs">
+public function __construct(
+    ArticleService $articleService,
+    CategoryService $categoryService,
+    MetaInterface $meta,
+    GeneralSetting $generalSetting,
+    TocService $tocService,
+    BannerService $bannerService
+)
+{
+    $this->articleService  = $articleService;
+    ...
+}
+</code></pre>
+</td>
+</tr>
+
+<tr>
+<td>2</td>
+<td>Minor</td>
+<td>Lint</td>
+<td>245</td>
+<td>PSR-12 - "Max line length ≤ 120"</td>
+<td>PHPCS cảnh báo: "Line exceeds 120 characters; contains 124 characters". Có một dòng quá dài (gây khó đọc và vi phạm line length).</td>
+<td>
+<p>Phân tách dòng dài thành nhiều dòng, hoặc gán giá trị phức tạp vào biến trước khi truyền vào view để đảm bảo mỗi dòng ≤ 120 ký tự.</p>
+<p>Ví dụ sửa (gãy mảng truyền vào view thành nhiều dòng):</p>
+<pre><code class="php language-php hljs">
+return view(
+    $view,
+    [
+        'article'          => $article,
+        'content'          => Arr::get($tocResult, 'updated_html', ''),
+        'toc'              => Arr::get($tocResult, 'toc', ''),
+        'recentPosts'      => $lengthAwarePaginator,
+        'schema'           => $schema,
+        'breadcrumbSchema' => $breadcrumbList,
+        'banners'          => $banners,
+    ]
+);
+</code></pre>
+</td>
+</tr>
+
+<tr>
+<td>3</td>
+<td>Major</td>
+<td>Diff (code change)</td>
+<td>Constructor</td>
+<td>Laravel 11 Conventions - "Use middleware/service provider for locale changes"</td>
+<td>Sử dụng app()->setLocale('vi') trực tiếp trong constructor của Controller. Đây là logic môi trường (app locale) nên nên đặt ở middleware hoặc ServiceProvider, không đặt ở constructor controller.</td>
+<td>
+<p>Di chuyển thiết lập locale sang middleware hoặc AppServiceProvider. Trong controller chỉ inject dependencies, không thay đổi global app state.</p>
+<p>Ví dụ Middleware:</p>
+<pre><code class="php language-php hljs">
+namespace App\Http\Middleware;
+
+use Closure;
+
+class SetLocale
+{
+    public function handle($request, Closure $next)
+    {
+        app()->setLocale(config('app.locale', 'vi'));
+        return $next($request);
+    }
+}
+</code></pre>
+<p>Hoặc trong AppServiceProvider::boot():</p>
+<pre><code class="php language-php hljs">
+public function boot()
+{
+    app()->setLocale(config('app.locale', 'vi'));
+}
+</code></pre>
+<p>Và loại bỏ dòng <code>app()->setLocale('vi');</code> khỏi constructor.</p>
+</td>
+</tr>
+
+<tr>
+<td>4</td>
+<td>Minor</td>
+<td>Diff</td>
+<td>File top (properties)</td>
+<td>PHPDoc Documentation - "PHPDoc for properties"</td>
+<td>Các thuộc tính typed (protected ArticleService $articleService; ...) thiếu PHPDoc mô tả. Mặc dù typed properties hợp lệ với PHPStan, theo checklist cần có PHPDoc cho class/properties để rõ mục đích (và cho các công cụ khác).</td>
+<td>
+<p>Thêm PHPDoc ngắn cho các thuộc tính để mô tả mục đích.</p>
+<p>Ví dụ:</p>
+<pre><code class="php language-php hljs">
+/**
+ * Service xử lý bài viết.
+ *
+ * @var ArticleService
+ */
+protected ArticleService $articleService;
+</code></pre>
+</td>
+</tr>
+</tbody>
+</table>
+
+<!-- 2. Summary -->
+<h3>2. Summary</h3>
+<ul>
+<li>Tổng số issues: 4</li>
+<li>Critical: 0</li>
+<li>Major: 1</li>
+<li>Minor: 3</li>
+</ul>
+
+<p>Rules checklist bị vi phạm (liệt kê rules và số bug tương ứng):</p>
+<ul>
+<li>PSR-12 / PSR-2 (brace style, line length): 2 violations (brace style, line length)</li>
+<li>Laravel 11 Conventions: 1 violation (setLocale in controller constructor)</li>
+<li>PHPDoc Documentation: 1 violation (missing property PHPDoc)</li>
+</ul>
+
+<!-- 3. Suggest Code Improvements -->
+<h3>3. Suggest Code Improvements</h3>
+<p>Dưới đây là toàn bộ file sau khi đã áp dụng các fixes, tối ưu nhỏ (đã loại bỏ app()->setLocale khỏi constructor, sửa vị trí dấu ngoặc mở của constructor theo PHPCS của project, gãy các dòng dài, thêm PHPDoc cho properties). Bạn có thể điều chỉnh lại style brace theo chuẩn dự án nếu dự án yêu cầu khác (PSR-12 vs project PHPCS).</p>
+
+<pre><code class="php language-php hljs">
+<?php
+namespace Parrot\Frontend\Http\Controllers;
+
+use Butschster\Head\Contracts\MetaTags\MetaInterface;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Arr;
+use Parrot\Banner\Enums\BannerPositionType;
+use Parrot\Banner\Services\BannerService;
+use Parrot\Base\Http\Controllers\FrontBaseController;
+use Parrot\Blog\Models\Article;
+use Parrot\Blog\Models\Category;
+use Parrot\Blog\Services\ArticleService;
+use Parrot\Blog\Services\CategoryService;
+use Parrot\Blog\Services\TocService;
+use Parrot\Setting\Models\GeneralSetting;
+use Spatie\SchemaOrg\Schema;
+
+/**
+ * Controller for handling frontend blog and category pages.
+ *
+ * @package Parrot\Frontend\Http\Controllers
+ */
+class FrontendController extends FrontBaseController
+{
+    /**
+     * Service xử lý bài viết.
+     *
+     * @var ArticleService
+     */
+    protected ArticleService $articleService;
+
+    /**
+     * Service xử lý category.
+     *
+     * @var CategoryService
+     */
+    protected CategoryService $categoryService;
+
+    /**
+     * Meta tags service.
+     *
+     * @var MetaInterface
+     */
+    protected MetaInterface $meta;
+
+    /**
+     * General settings model.
+     *
+     * @var GeneralSetting
+     */
+    protected GeneralSetting $setting;
+
+    /**
+     * Table of contents service.
+     *
+     * @var TocService
+     */
+    protected TocService $tocService;
+
+    /**
+     * Banner service.
+     *
+     * @var BannerService
+     */
+    protected BannerService $bannerService;
+
+    /**
+     * FrontendController constructor.
+     */
+    public function __construct(
+        ArticleService $articleService,
+        CategoryService $categoryService,
+        MetaInterface $meta,
+        GeneralSetting $generalSetting,
+        TocService $tocService,
+        BannerService $bannerService
+    )
+    {
+        $this->articleService  = $articleService;
+        $this->categoryService = $categoryService;
+        $this->meta            = $meta;
+        $this->setting         = $generalSetting;
+        $this->tocService      = $tocService;
+        $this->bannerService   = $bannerService;
+
+        // Lưu ý: setLocale đã được di chuyển ra middleware/AppServiceProvider.
+    }
+
+    /**
+     * Display the frontend home page.
+     *
+     * @return View
+     */
+    public function index(): View
+    {
+        $limit = 12;
+
+        $lengthAwarePaginator = $this->getLatestArticlesWithPageNo(
+            request()->merge(['limit' => $limit])
+        );
+
+        $this->meta->setTitle($this->setting->site_meta_title)
+            ->setKeywords($this->setting->site_meta_keyword)
+            ->setDescription($this->setting->site_meta_description);
+
+        $banners = $this->bannerService->getBannersByPosition(
+            BannerPositionType::HOMEPAGE->value
+        );
+
+        return view(
+            'frontend::home',
+            [
+                'articles' => $lengthAwarePaginator,
+                'banners'  => $banners,
+            ]
+        );
+    }
+
+    /**
+     * Handles AJAX requests to retrieve the latest articles.
+     *
+     * @param Request $request
+     * @return JsonResponse
+     */
+    public function ajaxGetLatestArticles(Request $request): JsonResponse
+    {
+        $lengthAwarePaginator = $this->getLatestArticlesWithPageNo($request);
+
+        return response()->json([
+            'status' => 'success',
+            'data'   => $lengthAwarePaginator,
+        ]);
+    }
+
+    /**
+     * Display the specified article based on the provided slug.
+     *
+     * @param string $slug
+     * @return View|Response
+     */
+    public function showArticle(string $slug): View|Response
+    {
+        $article = $this->articleService->getPublishedArticleBySlug($slug);
+
+        if (! $article instanceof Article) {
+            abort(404);
+        }
+
+        $this->meta->setTitle($article->meta_title)
+            ->setKeywords($article->meta_keyword)
+            ->setDescription($article->meta_description);
+
+        $article->load([
+            'category'       => static function ($query): void {
+                $query->select('id', 'name', 'slug');
+            },
+            'author'         => static function ($query): void {
+                $query->select('id', 'name', 'email');
+            },
+            'author.profile' => static function ($query): void {
+                $query->select('user_id', 'avatar_url', 'bio', 'position');
+            },
+        ]);
+
+        $this->setArticleAttributes($article);
+
+        $schema = Schema::article()
+            ->name($article->title)
+            ->headline($article->title)
+            ->description(strip_tags($article->meta_description))
+            ->author(Schema::person()->name($article->author_name))
+            ->datePublished($article->published_at)
+            ->dateModified($article->updated_at)
+            ->image(Schema::imageObject()->url($article->image))
+            ->publisher(
+                Schema::organization()
+                    ->name(config('app.name'))
+                    ->logo(Schema::imageObject()->url(asset('logo_thegioiphp.png')))
+            );
+
+        $breadcrumbList = Schema::breadcrumbList()
+            ->itemListElement([
+                Schema::listItem()
+                    ->position(1)
+                    ->name(trans('homepage'))
+                    ->item(route('frontend.index')),
+                Schema::listItem()
+                    ->position(2)
+                    ->name($article->category_name)
+                    ->item($article->category_url),
+                Schema::listItem()
+                    ->position(3)
+                    ->name($article->title)
+                    ->item($article->url),
+            ]);
+
+        $tocResult = $this->tocService->generateToc($article->content);
+
+        $limit = 8;
+
+        $lengthAwarePaginator = $this->getLatestArticlesWithPageNo(
+            request()->merge(['limit' => $limit])
+        );
+
+        $banners = $this->bannerService->getBannersByPosition(
+            BannerPositionType::SUBPAGE->value
+        );
+
+        $view = $article->is_tutorial
+            ? 'frontend::blog.article_detail_for_tutorial'
+            : 'frontend::blog.article_detail';
+
+        return view(
+            $view,
+            [
+                'article'          => $article,
+                'content'          => Arr::get($tocResult, 'updated_html', ''),
+                'toc'              => Arr::get($tocResult, 'toc', ''),
+                'recentPosts'      => $lengthAwarePaginator,
+                'schema'           => $schema,
+                'breadcrumbSchema' => $breadcrumbList,
+                'banners'          => $banners,
+            ]
+        );
+    }
+
+    /**
+     * Display the specified category page based on the provided slug.
+     *
+     * @param Request $request
+     * @param string $slug
+     * @return View|Response
+     */
+    public function showCategory(Request $request, string $slug): View|Response
+    {
+        $category = $this->categoryService->getCategoryBySlug($slug);
+
+        if (! $category instanceof Category) {
+            abort(404);
+        }
+
+        $this->meta->setTitle($category->meta_title)
+            ->setKeywords($category->meta_keyword)
+            ->setDescription($category->meta_description);
+
+        $request->merge(['category_id' => $category->id]);
+
+        $lengthAwarePaginator = $this->articleService->getFrontLatestArticles($request);
+
+        foreach ($lengthAwarePaginator as $article) {
+            $this->setArticleAttributes($article, $category);
+        }
+
+        $limit       = 8;
+        $recentPosts = $this->getLatestArticlesWithPageNo(
+            request()->merge(['limit' => $limit])
+        );
+
+        $banners = $this->bannerService->getBannersByPosition(
+            BannerPositionType::SUBPAGE->value
+        );
+
+        return view(
+            'frontend::blog.category',
+            [
+                'category'    => $category,
+                'articles'    => $lengthAwarePaginator,
+                'recentPosts' => $recentPosts,
+                'banners'     => $banners,
+            ]
+        );
+    }
+
+    /**
+     * Set additional attributes for an article instance.
+     *
+     * @param Article $article
+     * @param Category|null $category
+     * @return void
+     */
+    protected function setArticleAttributes(Article $article, ?Category $category = null): void
+    {
+        $category = $category instanceof Category ? $category : $article->category;
+
+        $category_name = trans('common.undefined');
+        $category_slug = '';
+        $category_url  = '';
+
+        if ($category) {
+            $category_name = $category->name;
+            $category_slug = $category->slug;
+        }
+
+        $category_url = empty($category_slug)
+            ? '#'
+            : route('frontend.blog.category.detail', ['slug' => ($category->slug ?? '')]);
+
+        $article->setAttribute(
+            'url',
+            route('frontend.blog.article.detail', ['slug' => $article->slug])
+        );
+
+        $article->setAttribute(
+            'image',
+            method_exists($article, 'getImageUrl') ? $article->getImageUrl() : $article->image
+        );
+
+        $article->setAttribute('category_name', $category_name);
+        $article->setAttribute('category_url', $category_url);
+        $article->setAttribute('published_at', $article->published_at ?? null);
+        $article->setAttribute('author_name', $article->author->name ?? null);
+        $article->setAttribute('author_avatar', $article->author->profile->avatar_url ?? null);
+    }
+
+    /**
+     * Retrieves the latest articles along with the current page number from the request.
+     *
+     * @param Request $request
+     * @return LengthAwarePaginator
+     */
+    protected function getLatestArticlesWithPageNo(Request $request): LengthAwarePaginator
+    {
+        $lengthAwarePaginator = $this->articleService->getFrontLatestArticles($request);
+
+        $lengthAwarePaginator->load([
+            'category' => static function ($query): void {
+                $query->select('id', 'name', 'slug');
+            },
+            'author'   => static function ($query): void {
+                $query->select('id', 'name');
+            },
+        ]);
+
+        foreach ($lengthAwarePaginator as $article) {
+            $this->setArticleAttributes($article);
+        }
+
+        return $lengthAwarePaginator;
+    }
+}
+</code></pre>
+
+<p>Gợi ý CI / checks sau khi sửa:</p>
+<ul>
+<li>Chạy phpcs/phpcbf để format theo chuẩn project: <code>composer lint</code> hoặc <code>vendor/bin/phpcs --standard=... </code></li>
+<li>Chạy PHPStan L6: <code>composer stan</code> và đảm bảo cấu hình larastan/extension file tồn tại hoặc loại bỏ tham chiếu nếu không dùng.</li>
+</ul>
+
+</div></p>
+</div>
+
+<hr>
+
+<div class="container">
+<h5>4. File: platform/packages/frontend/src/Views/Composers/SettingComposer.php</h5>
+<p>Ghi chú: Đã dừng tiến trình review tại file này.</p>
+</div>
+
+<hr>
+
+
+
+<hr>
+<p>Tổng thời gian thực thi: 82.11 giây</p>
+<p>Tổng tokens đã sử dụng: 14182 (prompt: 8540, completion: 5642)</p>
+</div>
+</body>
+</html>
