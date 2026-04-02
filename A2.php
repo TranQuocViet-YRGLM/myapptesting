@@ -26,15 +26,8 @@ class AbstractShoppingController extends AbstractController
      * @var PurchaseFlow
      */
     protected $purchaseFlow;
-
-    /**
-     * @param PurchaseFlow $shoppingPurchaseFlow
-     */
-    #[Required]
-    public function setPurchaseFlow(PurchaseFlow $shoppingPurchaseFlow)
-    {
-        $this->purchaseFlow = $shoppingPurchaseFlow;
-    }
+   
+    
 
     /**
      * @param ItemHolderInterface $itemHolder
