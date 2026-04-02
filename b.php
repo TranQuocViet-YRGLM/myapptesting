@@ -53,10 +53,6 @@ class AbstractShoppingController extends AbstractController
             $this->addError($error->getMessage());
         }
 
-        if (!$returnResponse) {
-            return $flowResult;
-        }
-
 
 
         return null;
