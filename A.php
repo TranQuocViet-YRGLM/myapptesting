@@ -57,11 +57,6 @@ class AbstractShoppingController extends AbstractController
             return $flowResult;
         }
 
-        if ($flowResult->hasError()) {
-            log_info('Errorが発生したため購入エラー画面へ遷移します.', [$flowResult->getErrors()]);
-
-            return $this->redirectToRoute('shopping_error');
-        }
 
 
         return null;
