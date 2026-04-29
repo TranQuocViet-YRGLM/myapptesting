@@ -75,10 +75,10 @@ jobs:
       - name: Send Slack
         if: always()
         run: |
-          if [ -f review.txt ] && [ -n "${{ secrets.SLACK_WEBHOOK }}" ]; then
+          if [ -f review.txt ] && [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
             curl -X POST -H 'Content-type: application/json' \
             --data "{\"text\":\"AI Review:\n$(cat review.txt)\"}" \
-            ${{ secrets.SLACK_WEBHOOK }}
+            ${{ secrets.SLACK_WEBHOOK_URL }}
           else
             echo "Skip Slack"
           fi
