@@ -48,13 +48,15 @@
 ## 8. Output yêu cầu khi review
 Khi review code, hãy trả kết quả theo bảng:
 
-| File | Dòng | Vấn đề | Gợi ý sửa |Phân loại
-|------|------|--------|-----------|-----------|
-| tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |🔴 Critical|
-| tên_file_2.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |🟠 Important|
-| main.php | 12 | Không validate input | Thêm kiểm tra dữ liệu đầu vào |🟢 Suggestion|
+    Ngày: yyyy/mm/dd hh:mm
 
-Với Phân loại có các loại sau:
+    | File | Dòng | Vấn đề | Gợi ý sửa |Phân loại
+    |------|------|--------|-----------|-----------|
+    | tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |🔴 Critical|
+    | tên_file_2.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |🟠 Important|
+    | main.php | 12 | Không validate input | Thêm kiểm tra dữ liệu đầu vào |🟢 Suggestion|
+
+Mô tả: Với Phân loại có các loại sau:
   🔴 Critical: quan trọng và phải bắt buộc sửa
   🟠 Important: cần thiết sửa
   🟢 Suggestion: gợi ý (có thể sửa hoặc không)
