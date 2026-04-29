@@ -49,10 +49,6 @@ $diff
 
 ===== OUTPUT YÊU CẦU =====
 - Trả lời bằng tiếng Việt
-- Phân loại:
-  🔴 Critical
-  🟠 Important
-  🟢 Suggestion
 - Chỉ ra file + dòng (nếu có thể)
 - Không nói chung chung
 - Nếu không có lỗi → ghi: No issue found
