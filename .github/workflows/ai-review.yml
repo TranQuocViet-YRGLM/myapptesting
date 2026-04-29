@@ -88,7 +88,7 @@ jobs:
           echo "=== Sending prompt to OpenAI (truncated preview) ==="
           echo "$PROMPT" | sed -n '1,200p'
 
-          REQUEST_BODY=$(jq -n --arg system "Bạn là một kỹ sư phần mềm cấp cao đang xem xét mã nguồn.YÊU CẦU OUTPUT: Trả lời bằng tiếng Việt" --arg user "$PROMPT" '{
+          REQUEST_BODY=$(jq -n --arg system "Bạn là một kỹ sư phần mềm cấp cao đang xem xét mã nguồn" --arg user "$PROMPT" '{
             model: "gpt-4o-mini",
             messages: [
               {role: "system", content: $system},
