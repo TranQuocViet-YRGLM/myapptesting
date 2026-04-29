@@ -77,7 +77,7 @@ jobs:
         run: |
           if [ -f review.txt ] && [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
             curl -X POST -H 'Content-type: application/json' \
-            --data "{\"text\":\"AI Review:\n$(cat review.txt)\"}" \
+            --data "{\"text\":\"=========== AI Review: ==============\n$(cat review.txt)\"}" \
             ${{ secrets.SLACK_WEBHOOK_URL }}
           else
             echo "Skip Slack"
