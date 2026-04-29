@@ -2,9 +2,13 @@ name: AI Code Review (PHP)
 
 on:
   push:
+    paths:
+      - '**.php'
     branches:
       - main
   pull_request:
+    paths:
+      - '**.php'
     branches:
       - main
 
