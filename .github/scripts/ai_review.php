@@ -40,15 +40,15 @@ if (preg_match('/\.php\b/', $diff)) {
 $prompt = "
 Bạn là senior PHP developer rất khó tính.
 
-===== RULE =====
+Hãy review code theo rule sau:
 $rules
 
 ===== CODE DIFF =====
 $diff
 
+
 ===== OUTPUT YÊU CẦU =====
 - Trả lời bằng tiếng Việt
-- Format rõ ràng, dễ đọc
 - Phân loại:
   🔴 Critical
   🟠 Important
