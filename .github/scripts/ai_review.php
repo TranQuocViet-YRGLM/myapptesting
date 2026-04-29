@@ -9,31 +9,46 @@ if (!$apiKey) {
 }
 
 // ===== READ FILES =====
-$rules = file_get_contents(".github/workflows/review_rules.md");
-$diff  = file_get_contents("diff.txt");
+$commonRulesPath = ".github/wokflows/common_rules.md";
+$phpstanRulesPath = ".github/wokflows/phpstan_rules.md";
 
+$commonRules = file_exists($commonRulesPath) ? file_get_contents($commonRulesPath) : "";
+$phpstanRules = file_exists($phpstanRulesPath) ? file_get_contents($phpstanRulesPath) : "";
+
+$diff = file_get_contents("diff.txt");
+
+// ===== CHECK DIFF =====
 if (!$diff || trim($diff) === "") {
     echo "No diff to review\n";
     file_put_contents("review.txt", "No PHP changes detected.");
     exit(0);
 }
 
-// ===== LIMIT DIFF (tránh AI quá tải) =====
+// ===== LIMIT DIFF =====
 $diff = substr($diff, 0, 12000);
+
+// ===== RULE SELECTOR =====
+$rules = $commonRules;
+
+// Detect PHP file change chuẩn hơn
+if (preg_match('/\.php\b/', $diff)) {
+    $rules .= "\n\n===== PHPSTAN RULE =====\n";
+    $rules .= $phpstanRules;
+}
 
 // ===== PROMPT =====
 $prompt = "
 Bạn là senior PHP developer rất khó tính.
 
-Hãy review code theo rule sau:
+===== RULE =====
 $rules
 
 ===== CODE DIFF =====
 $diff
 
-
 ===== OUTPUT YÊU CẦU =====
 - Trả lời bằng tiếng Việt
+- Format rõ ràng, dễ đọc (KHÔNG dùng bảng Markdown)
 - Phân loại:
   🔴 Critical
   🟠 Important
@@ -54,13 +69,15 @@ $data = [
 
 $ch = curl_init("https://api.openai.com/v1/chat/completions");
 
-curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-curl_setopt($ch, CURLOPT_POST, true);
-curl_setopt($ch, CURLOPT_HTTPHEADER, [
-    "Content-Type: application/json",
-    "Authorization: Bearer $apiKey"
+curl_setopt_array($ch, [
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_POST => true,
+    CURLOPT_HTTPHEADER => [
+        "Content-Type: application/json",
+        "Authorization: Bearer $apiKey"
+    ],
+    CURLOPT_POSTFIELDS => json_encode($data),
 ]);
-curl_setopt($ch, CURLOPT_POSTFIELDS, json_encode($data));
 
 $response = curl_exec($ch);
 
