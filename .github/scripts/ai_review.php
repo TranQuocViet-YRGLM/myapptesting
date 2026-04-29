@@ -48,7 +48,7 @@ $diff
 
 ===== OUTPUT YÊU CẦU =====
 - Trả lời bằng tiếng Việt
-- Format rõ ràng, dễ đọc (KHÔNG dùng bảng Markdown)
+- Format rõ ràng, dễ đọc
 - Phân loại:
   🔴 Critical
   🟠 Important
