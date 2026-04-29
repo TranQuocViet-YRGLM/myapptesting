@@ -8,10 +8,14 @@
 - Tất cả file đều phải **theo chuẩn định dạng** (PSR-1, PSR-12 nếu PHP; PEP8 nếu Python, v.v.).
 
 ## 2. Quy tắc đặt tên
-- Biến: `camelCase`.
-- Hằng số: `UPPER_CASE`.
-- Class: `PascalCase`.
-- Tên hàm: `camelCase` và mô tả đúng chức năng.
+| Element | Style |
+|---------|-------|
+| Indent | 4 spaces |
+| Line length | 120 max |
+| Methods | camelCase |
+| Classes | PascalCase |
+| Constants | UPPER_SNAKE_CASE |
+| Properties | camelCase |
 
 ## 3. Cấu trúc & tổ chức code
 - Tách code thành các hàm/method nhỏ gọn (dưới 50 dòng).
