@@ -1,8 +1,12 @@
 name: AI Code Review (PHP)
 
 on:
+  push:
+    branches:
+      - main
   pull_request:
-    branches: [main]
+    branches:
+      - main
 
 permissions:
   contents: read
@@ -16,6 +20,8 @@ jobs:
       # 1. Checkout
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       # 2. Setup PHP
       - name: Setup PHP
@@ -30,8 +36,14 @@ jobs:
       # 4. Lấy diff chỉ file PHP
       - name: Get diff
         run: |
-          git fetch origin ${{ github.base_ref }}
-          git diff origin/${{ github.base_ref }} -- '*.php' > diff.txt
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Running PR diff"
+            git fetch origin ${{ github.base_ref }}
+            git diff origin/${{ github.base_ref }} -- '*.php' > diff.txt
+          else
+            echo "Running push diff"
+            git diff HEAD~1 HEAD -- '*.php' > diff.txt
+          fi
 
       # 5. Debug diff (optional)
       - name: Show diff size
@@ -45,12 +57,13 @@ jobs:
 
       # 7. Comment vào PR
       - name: Comment PR
+        if: github.event_name == 'pull_request'
         uses: actions/github-script@v7
         with:
           script: |
             const fs = require('fs');
             const review = fs.readFileSync('review.txt', 'utf8');
-
+      
             await github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
@@ -62,6 +75,11 @@ jobs:
       - name: Send Slack
         if: always()
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"AI Review:\n$(cat review.txt)\"}" \
-          ${{ secrets.SLACK_WEBHOOK }}
+          if [ -f review.txt ] && [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"AI Review:\n$(cat review.txt)\"}" \
+            ${{ secrets.SLACK_WEBHOOK_URL }}
+          else
+            echo "Skip Slack"
+          fi
+                    
