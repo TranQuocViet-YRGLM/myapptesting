@@ -44,10 +44,10 @@
 ## 8. Output yêu cầu khi review
 Khi review code, hãy trả kết quả theo bảng:
 
-| File | Dòng | Vấn đề | Gợi ý sửa |
-|------|------|--------|-----------|
-| tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |
-| main.py | 12 | Không validate input | Thêm kiểm tra dữ liệu đầu vào |
+| File | Dòng | Vấn đề | Gợi ý sửa |Phân loại
+|------|------|--------|-----------|-----------|
+| tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |Important|
+| main.py | 12 | Không validate input | Thêm kiểm tra dữ liệu đầu vào |Suggestion|
 
 - Phải chỉ rõ file + dòng (nếu có thể)
 - Không nói chung chung
