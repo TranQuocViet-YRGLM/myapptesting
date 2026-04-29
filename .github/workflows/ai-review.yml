@@ -34,8 +34,14 @@ jobs:
       # 4. Lấy diff chỉ file PHP
       - name: Get diff
         run: |
-          git fetch origin ${{ github.base_ref }}
-          git diff origin/${{ github.base_ref }} -- '*.php' > diff.txt
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            echo "Running PR diff"
+            git fetch origin ${{ github.base_ref }}
+            git diff origin/${{ github.base_ref }} -- '*.php' > diff.txt
+          else
+            echo "Running push diff"
+            git diff HEAD~1 HEAD -- '*.php' > diff.txt
+          fi
 
       # 5. Debug diff (optional)
       - name: Show diff size
@@ -66,6 +72,10 @@ jobs:
       - name: Send Slack
         if: always()
         run: |
-          curl -X POST -H 'Content-type: application/json' \
-          --data "{\"text\":\"AI Review:\n$(cat review.txt)\"}" \
-          ${{ secrets.SLACK_WEBHOOK }}
+          if [ -f review.txt ]; then
+            curl -X POST -H 'Content-type: application/json' \
+            --data "{\"text\":\"AI Review:\n$(cat review.txt)\"}" \
+            ${{ secrets.SLACK_WEBHOOK }}
+          else
+            echo "No review.txt, skip Slack"
+          fi
