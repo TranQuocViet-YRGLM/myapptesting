@@ -81,7 +81,7 @@ jobs:
         run: |
           if [ -f review.txt ] && [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
       
-            REVIEW=$(cat review.txt | sed 's/"/\\"/g')
+            REVIEW=$(cat review.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
       
             curl -X POST -H 'Content-type: application/json' \
             --data "{
@@ -97,7 +97,7 @@ jobs:
                   \"type\": \"section\",
                   \"text\": {
                     \"type\": \"mrkdwn\",
-                    \"text\": \"$REVIEW\"
+                    \"text\": $REVIEW
                   }
                 }
               ]
