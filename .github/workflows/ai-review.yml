@@ -1,14 +1,10 @@
 name: AI Code Review (PHP)
 
-#Chạy khi
 on:
-  push: #push vào nhánh
+  push:
     branches:
       - main
-      
-  pull_request: #khi có merge vào
-    paths:
-      - '**.php'
+  pull_request:
     branches:
       - main
 
@@ -40,27 +36,18 @@ jobs:
       # 4. Lấy diff chỉ file PHP
       - name: Get diff
         run: |
-          echo "Event: ${{ github.event_name }}"
-      
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "PR mode"
+            echo "Running PR diff"
             git fetch origin ${{ github.base_ref }}
             git diff origin/${{ github.base_ref }} -- '*.php' > diff.txt
-      
           else
-            echo "Push mode (multi-commit safe)"
-      
-            git diff ${{ github.event.before }} ${{ github.sha }} -- '*.php' > diff.txt
+            echo "Running push diff"
+            git diff HEAD~1 HEAD -- '*.php' > diff.txt
           fi
-      
-          echo "==== DIFF FILES ===="
-          cat diff.txt || true
 
       # 5. Debug diff (optional)
-      - name: Debug diff
-        run: |
-          echo "Changed files:"
-          git diff --name-only ${{ github.event.before }} ${{ github.sha }} || true
+      - name: Show diff size
+        run: wc -c diff.txt
 
       # 6. Run AI script
       - name: Run AI Review
@@ -89,30 +76,9 @@ jobs:
         if: always()
         run: |
           if [ -f review.txt ] && [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
-      
-            REVIEW=$(cat review.txt | python3 -c 'import json,sys; print(json.dumps(sys.stdin.read()))')
-      
             curl -X POST -H 'Content-type: application/json' \
-            --data "{
-              \"blocks\": [
-                {
-                  \"type\": \"header\",
-                  \"text\": {
-                    \"type\": \"plain_text\",
-                    \"text\": \"🤖 AI Code Review\"
-                  }
-                },
-                {
-                  \"type\": \"section\",
-                  \"text\": {
-                    \"type\": \"mrkdwn\",
-                    \"text\": $REVIEW
-                  }
-                }
-              ]
-            }" \
+            --data "{\"text\":\"AI Review:\n$(cat review.txt)\"}" \
             ${{ secrets.SLACK_WEBHOOK_URL }}
-      
           else
             echo "Skip Slack"
           fi
