@@ -33,17 +33,11 @@ $diff
 
 
 ===== OUTPUT YÊU CẦU =====
-- KHÔNG dùng bảng Markdown
-- Format như sau:
-
-🔹 File: <file>
-   Dòng: <line>
-   Vấn đề: <desc>
-   Gợi ý: <fix>
-   Mức độ: 🔴Critical /🟠Important/🟢Suggestion
-
-- Mỗi issue cách nhau 1 dòng
 - Trả lời bằng tiếng Việt
+- Phân loại:
+  🔴 Critical
+  🟠 Important
+  🟢 Suggestion
 - Chỉ ra file + dòng (nếu có thể)
 - Không nói chung chung
 - Nếu không có lỗi → ghi: No issue found
