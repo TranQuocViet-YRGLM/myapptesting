@@ -40,18 +40,27 @@ jobs:
       # 4. Lấy diff chỉ file PHP
       - name: Get diff
         run: |
+          echo "Event: ${{ github.event_name }}"
+      
           if [ "${{ github.event_name }}" = "pull_request" ]; then
-            echo "Running PR diff"
+            echo "PR mode"
             git fetch origin ${{ github.base_ref }}
             git diff origin/${{ github.base_ref }} -- '*.php' > diff.txt
+      
           else
-            echo "Running push diff"
-            git diff HEAD~1 HEAD -- '*.php' > diff.txt
+            echo "Push mode (multi-commit safe)"
+      
+            git diff ${{ github.event.before }} ${{ github.sha }} -- '*.php' > diff.txt
           fi
+      
+          echo "==== DIFF FILES ===="
+          cat diff.txt || true
 
       # 5. Debug diff (optional)
-      - name: Show diff size
-        run: wc -c diff.txt
+      - name: Debug diff
+        run: |
+          echo "Changed files:"
+          git diff --name-only ${{ github.event.before }} ${{ github.sha }} || true
 
       # 6. Run AI script
       - name: Run AI Review
