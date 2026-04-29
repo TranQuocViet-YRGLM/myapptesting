@@ -1,12 +1,12 @@
 name: AI Code Review (PHP)
 
+#Chạy khi
 on:
-  push:
-    paths:
-      - '**.php'
+  push: #push vào nhánh
     branches:
       - main
-  pull_request:
+      
+  pull_request: #khi có merge vào
     paths:
       - '**.php'
     branches:
