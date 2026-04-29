@@ -9,8 +9,8 @@ if (!$apiKey) {
 }
 
 // ===== READ FILES =====
-$commonRulesPath = ".github/wokflows/common_rules.md";
-$phpstanRulesPath = ".github/wokflows/phpstan_rules.md";
+$commonRulesPath = ".github/workflows/common_rules.md";
+$phpstanRulesPath = ".github/workflows/phpstan_rules.md";
 
 $commonRules = file_exists($commonRulesPath) ? file_get_contents($commonRulesPath) : "";
 $phpstanRules = file_exists($phpstanRulesPath) ? file_get_contents($phpstanRulesPath) : "";
