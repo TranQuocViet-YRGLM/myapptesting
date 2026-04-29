@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 //
 // +----------------------------------------------------------------------+
-// | PHP Version 4                                                        |
+// | PHP                                                                  |
 // +----------------------------------------------------------------------+
 // | Copyright (c) 1997-2002 The PHP Group                                |
 // +----------------------------------------------------------------------+
@@ -18,7 +18,7 @@
 // |          Lorenzo Alberton <l dot alberton at quipo dot it>           |
 // +----------------------------------------------------------------------+
 //
-// $Id: Uri.php,v 1.3 2004/08/16 09:04:20 hfuecks Exp $
+// $Id: Uri.php,v 1.1 2004/08/16 09:03:55 hfuecks Exp $
 //
 /**
  * @package Calendar
@@ -26,54 +26,60 @@
  */
 
 /**
- * Allows Calendar include path to be redefined
- * @ignore
- */
-if (!defined('CALENDAR_ROOT')) {
-    define('CALENDAR_ROOT', 'Calendar'.DIRECTORY_SEPARATOR);
-}
-
-/**
- * Load Calendar decorator base class
- */
-require_once CALENDAR_ROOT.'Decorator.php';
-
-/**
- * Load the Uri utility
- */
-require_once CALENDAR_ROOT.'Util'.DIRECTORY_SEPARATOR.'Uri.php';
-
-/**
- * Decorator to help with building HTML links for navigating the calendar<br />
- * <b>Note:</b> for performance you should prefer Calendar_Util_Uri unless you
- * have a specific need to use a decorator
+ * Utility to help building HTML links for navigating the calendar<br />
  * <code>
  * $Day = new Calendar_Day(2003, 10, 23);
- * $Uri = & new Calendar_Decorator_Uri($Day);
- * $Uri->setFragments('year', 'month', 'day');
- * echo $Uri->getPrev(); // Displays year=2003&month=10&day=22
+ * $Uri = & new Calendar_Util_Uri('year', 'month', 'day');
+ * echo $Uri->prev($Day,'month'); // Displays year=2003&amp;month=10
+ * echo $Uri->prev($Day,'day'); // Displays year=2003&amp;month=10&amp;day=22
+ * $Uri->seperator = '/';
+ * $Uri->scalar = true;
+ * echo $Uri->prev($Day,'month'); // Displays 2003/10
+ * echo $Uri->prev($Day,'day'); // Displays 2003/10/22
  * </code>
- * @see Calendar_Util_Uri
  * @package Calendar
  * @access public
  */
-class Calendar_Decorator_Uri extends Calendar_Decorator
+class Calendar_Util_Uri
 {
+    /**
+     * Uri fragments for year, month, day etc.
+     * @var array
+     * @access private
+     */
+    var $uris = array();
 
     /**
-    * @var Calendar_Util_Uri
-    * @access private
-    */
-    var $Uri;
+     * String to separate fragments with.
+     * Set to just & for HTML.
+     * For a scalar URL you might use / as the seperator
+     * @var string (default XHTML &amp;)
+     * @access public
+     */
+    var $separator = '&amp;';
+
+    /**
+     * To output a "scalar" string - variable names omitted.
+     * Used for urls like index.php/2004/8/12
+     * @var boolean (default false)
+     * @access public
+     */
+    var $scalar = false;
 
     /**
      * Constructs Calendar_Decorator_Uri
-     * @param object subclass of Calendar
+     * The term "fragment" means <i>name</i> of a calendar GET variables in the URL
+     * @param string URI fragment for year
+     * @param string (optional) URI fragment for month
+     * @param string (optional) URI fragment for day
+     * @param string (optional) URI fragment for hour
+     * @param string (optional) URI fragment for minute
+     * @param string (optional) URI fragment for second
      * @access public
      */
-    function __construct(&$Calendar)
+    public function __construct($y, $m=null, $d=null, $h=null, $i=null, $s=null)
     {
-        parent::__construct($Calendar);
+        $this->setFragments($y, $m, $d, $h, $i, $s);
     }
 
     /**
@@ -88,64 +94,76 @@ class Calendar_Decorator_Uri extends Calendar_Decorator
      * @access public
      */
     function setFragments($y, $m=null, $d=null, $h=null, $i=null, $s=null) {
-        $this->Uri = new Calendar_Util_Uri($y, $m, $d, $h, $i, $s);
-    }
-
-    /**
-     * Sets the separator string between fragments
-     * @param string separator e.g. /
-     * @return void
-     * @access public
-     */
-    function setSeparator($separator)
-    {
-        $this->Uri->separator = $separator;
-    }
-
-    /**
-     * Puts Uri decorator into "scalar mode" - URI variable names are not
-     * returned
-     * @param boolean (optional)
-     * @return void
-     * @access public
-     */
-    function setScalar($state=true)
-    {
-        $this->Uri->scalar = $state;
+        if (!is_null($y)) $this->uris['Year']   = $y;
+        if (!is_null($m)) $this->uris['Month']  = $m;
+        if (!is_null($d)) $this->uris['Day']    = $d;
+        if (!is_null($h)) $this->uris['Hour']   = $h;
+        if (!is_null($i)) $this->uris['Minute'] = $i;
+        if (!is_null($s)) $this->uris['Second'] = $s;
     }
 
     /**
      * Gets the URI string for the previous calendar unit
-     * @param string calendar unit to fetch uri for (year,month,week or day etc)
+     * @param object subclassed from Calendar e.g. Calendar_Month
+     * @param string calendar unit ( must be year, month, week, day, hour, minute or second)
      * @return string
      * @access public
      */
-    function prev($method)
+    function prev($Calendar, $unit)
     {
-        return $this->Uri->prev($this, $method);
+        $method = 'prev'.$unit;
+        $stamp  = $Calendar->{$method}('timestamp');
+        return $this->buildUriString($Calendar, $method, $stamp);
     }
 
     /**
      * Gets the URI string for the current calendar unit
-     * @param string calendar unit to fetch uri for (year,month,week or day etc)
+     * @param object subclassed from Calendar e.g. Calendar_Month
+     * @param string calendar unit ( must be year, month, week, day, hour, minute or second)
      * @return string
      * @access public
      */
-    function this($method)
+    function this($Calendar, $unit)
     {
-        return $this->Uri->this($this, $method);
+       $method = 'this'.$unit;
+        $stamp  = $Calendar->{$method}('timestamp');
+        return $this->buildUriString($Calendar, $method, $stamp);
     }
 
     /**
      * Gets the URI string for the next calendar unit
-     * @param string calendar unit to fetch uri for (year,month,week or day etc)
+     * @param object subclassed from Calendar e.g. Calendar_Month
+     * @param string calendar unit ( must be year, month, week, day, hour, minute or second)
      * @return string
      * @access public
      */
-    function next($method)
+    function next($Calendar, $unit)
     {
-        return $this->Uri->next($this, $method);
+        $method = 'next'.$unit;
+        $stamp  = $Calendar->{$method}('timestamp');
+        return $this->buildUriString($Calendar, $method, $stamp);
     }
 
+    /**
+     * Build the URI string
+     * @param string method substring
+     * @param int timestamp
+     * @return string build uri string
+     * @access private
+     */
+    function buildUriString($Calendar, $method, $stamp)
+    {
+        $uriString = '';
+        $cE = & $Calendar->getEngine();
+        $separator = '';
+        foreach ($this->uris as $unit => $uri) {
+            $call = 'stampTo'.$unit;
+            $uriString .= $separator;
+            if (!$this->scalar) $uriString .= $uri.'=';
+            $uriString .= $cE->{$call}($stamp);
+            $separator = $this->separator;
+        }
+        return $uriString;
+    }
 }
 ?>
