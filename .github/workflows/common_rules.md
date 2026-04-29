@@ -48,8 +48,6 @@
 ## 8. Output yêu cầu khi review
 Khi review code, hãy trả kết quả theo bảng:
 
-    Ngày: yyyy/mm/dd hh:mm
-
     | File | Dòng | Vấn đề | Gợi ý sửa |Phân loại
     |------|------|--------|-----------|-----------|
     | tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |🔴 Critical|
