@@ -49,3 +49,6 @@ Khi review code, hãy trả kết quả theo bảng:
 | tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |
 | main.py | 12 | Không validate input | Thêm kiểm tra dữ liệu đầu vào |
 
+- Phải chỉ rõ file + dòng (nếu có thể)
+- Không nói chung chung
+- Nếu không có issue → ghi rõ "No issue found"
