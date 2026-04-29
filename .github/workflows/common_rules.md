@@ -50,14 +50,14 @@ Khi review code, hãy trả kết quả theo bảng:
 
 | File | Dòng | Vấn đề | Gợi ý sửa |Phân loại
 |------|------|--------|-----------|-----------|
-| tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |High|
-| tên_file_2.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |Medium|
-| main.php | 12 | Không validate input | Thêm kiểm tra dữ liệu đầu vào |Low|
+| tên_file.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |🔴 Critical|
+| tên_file_2.php | 25 | Hàm quá dài (80 dòng) | Tách hàm thành nhiều hàm nhỏ |🟠 Important|
+| main.php | 12 | Không validate input | Thêm kiểm tra dữ liệu đầu vào |🟢 Suggestion|
 
 Với Phân loại có các loại sau:
-    High: Quan trọng nhất (cần phải sửa)
-    Medium: Mức trung bình 
-    Low: thấp (có thể sửa hoặc không)
+  🔴 Critical: quan trọng và phải bắt buộc sửa
+  🟠 Important: cần thiết sửa
+  🟢 Suggestion: gợi ý (có thể sửa hoặc không)
 
 
 - Phải chỉ rõ file + dòng (nếu có thể)
